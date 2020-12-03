@@ -1,14 +1,17 @@
-const { formatResultsErrors } = require("jest-message-util");
-const Potion = require("../lib/Potion");
+const Potion = require('../lib/Potion');
 
-function Player(name = "") {
+function Player(name = '') {
   this.name = name;
 
   this.health = Math.floor(Math.random() * 10 + 95);
   this.strength = Math.floor(Math.random() * 5 + 7);
-  this.agility = Math.floor(Math.random() * 5 + 7)
+  this.agility = Math.floor(Math.random() * 5 + 7);
 
-  this.inventory = [new Potion("health"), new Potion()];
+  this.inventory = [new Potion('health'), new Potion()];
+}
+
+Player.prototype.getHealth = function() {
+  return `${this.name}'s health is now ${this.health}!`;
 };
 
 Player.prototype.getStats = function() {
@@ -21,14 +24,10 @@ Player.prototype.getStats = function() {
 };
 
 Player.prototype.getInventory = function() {
-  if(this.inventory.length) {
+  if (this.inventory.length) {
     return this.inventory;
   }
   return false;
-};
-
-Player.prototype.getHealth = function() {
-  return `${this.name}'s health is now ${this.health}.`;
 };
 
 Player.prototype.isAlive = function() {
@@ -36,13 +35,25 @@ Player.prototype.isAlive = function() {
     return false;
   }
   return true;
-}
+};
 
-Player.prototype.reduceHealth = function(health) {
-  this.health -= health;
+Player.prototype.addPotion = function(potion) {
+  this.inventory.push(potion);
+};
 
-  if (this.health < 0) {
-    this.health = 0;
+Player.prototype.usePotion = function(index) {
+  const potion = this.inventory.splice(index, 1)[0];
+
+  switch (potion.name) {
+    case 'agility':
+      this.agility += potion.value;
+      break;
+    case 'health':
+      this.health += potion.value;
+      break;
+    case 'strength':
+      this.strength += potion.value;
+      break;
   }
 };
 
@@ -53,23 +64,11 @@ Player.prototype.getAttackValue = function() {
   return Math.floor(Math.random() * (max - min) + min);
 };
 
-Player.prototype.addPotion = function(potion) {
-  this.inventory.push(potion);
-};
+Player.prototype.reduceHealth = function(health) {
+  this.health -= health;
 
-Player.prototype.usePotion = function(index) {
-  const potion = this.getInventory().splice(index, 1)[0];
-
-  switch (potion.name) {
-    case "agility":
-      this.agility += potion.value;
-      break;
-    case "health":
-      this.health += potion.value;
-      break;
-    case "strength":
-      this.strength += potion.value;
-      break;
+  if (this.health < 0) {
+    this.health = 0;
   }
 };
 
